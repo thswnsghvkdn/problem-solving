@@ -32,5 +32,5 @@ int main()
 		tot[i] = -1;
 	}
 	cout << go(0);
-	
+	cout << go(1);
 }
