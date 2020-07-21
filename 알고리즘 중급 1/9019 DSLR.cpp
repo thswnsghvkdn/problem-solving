@@ -7,6 +7,7 @@ int n;
 
 
 int command_L(int temp)
+// arr = (arr % 1000) * 10 + arr / 1000;
 {
 	int share = temp / 1000;
 	temp %= 1000;
@@ -14,12 +15,13 @@ int command_L(int temp)
 	return (temp + share);
 }
 int command_R(int temp)
+// arr = (arr % 10) * 1000 + (arr / 10);
 {
 	int md = temp % 10;
 	temp /= 10;
 	md *= 1000;
-	if (md == 0)
-		md = 1000;
+	//if (md == 0)
+	//	md = 1000;
 	return (temp + md);
 }
 int main()
@@ -55,7 +57,7 @@ int main()
 				{
 					arr = test.first;
 					t_str = test.second;
-					t_str += 'D';
+					t_str += "D";
 					arr *= 2;
 					if (arr > 9999)
 					{
@@ -76,7 +78,7 @@ int main()
 				{
 					arr = test.first;
 					t_str = test.second;
-					t_str += 'S';
+					t_str += "S";
 					arr -= 1;
 					if (arr < 0)
 					{
@@ -98,8 +100,8 @@ int main()
 				{
 					arr = test.first;
 					t_str = test.second;
-					t_str += 'L';
-					arr = command_L(arr);
+					t_str += "L";
+					arr = (arr % 1000) * 10 + arr / 1000;
 					if (arr == goal) {
 						cout << t_str << "\n";
 						flag = true;
@@ -116,8 +118,8 @@ int main()
 				{
 					arr = test.first;
 					t_str = test.second;
-					t_str += 'R';
-					arr = command_R(arr);
+					t_str += "R";
+					arr = (arr % 10 ) * 1000 + (arr / 10);
 					if (arr == goal) {
 						cout << t_str << "\n";
 						flag = true;

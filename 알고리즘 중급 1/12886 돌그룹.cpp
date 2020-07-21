@@ -45,7 +45,6 @@ int main()
 			cout << 1;
 			return 0;
 		}
-		check[t1][t2] = true;
 
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
