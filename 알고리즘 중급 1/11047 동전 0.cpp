@@ -14,7 +14,7 @@ int main()
 	int share;
 	while (k > 0 && n > 0)
 	{
-		if (change[n] < k)
+		if (change[n] <= k)
 		{
 			share = k / change[n];
 			k -= (change[n] * share);
