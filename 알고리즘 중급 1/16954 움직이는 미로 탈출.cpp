@@ -6,65 +6,70 @@ using namespace std;
 
 int dx[] = { 0,0,1,-1, -1 ,-1, 1, 1, 0};
 int dy[] = { 1,-1,0,0, -1 , 1,-1, 1, 0};
-int map[8][8];
-vector<pair<int, int>>v;
-queue <pair<int, int>>q;
+int map[10][8][8];
 
-void move_wall()
-{
-	for (int i = 0; i < v.size(); i++)
-	{
-		auto p = v[i];
-		v[i] = make_pair(p.first + 1, p.second);
-	}
-}
-bool check_wall(int r, int c)
-{
-	for (int i = 0; i < v.size(); i++)
-	{
-		if (v[i] == make_pair(r, c) || make_pair(v[i].first + 1, v[i].second) == make_pair(r, c))
-			return false;
-	}
-	return true;
-}
+struct Point {
+	int time;
+	int row;
+	int col;
+};
 
 int main()
 {
-	char temp;
 	string s;
-	for (int i = 0; i < 8; i++) {
+	queue<Point> q;
+	for (int i = 0; i < 8; i++)
+	{
 		cin >> s;
 		for (int j = 0; j < 8; j++)
 		{
-			if (s[j] == '#')
-				v.push_back(make_pair(i, j));
+			if (s[j] == '.')
+				map[0][i][j] = 0;
+			else {
+				map[0][i][j] = 1;
+			}
 		}
 	}
-	q.push(make_pair(7, 0));
+
+	q.push({ 0 , 7 , 0 });
+
+	// 각 시간에 따른(1초부터 8초까지) 벽의 정보를 저장한다.
+	for(int t = 0 ;t < 8 ; t++)
+		for(int i = 0 ; i < 8 ; i++ )
+			for (int j = 0; j < 8; j++)
+			{
+				// 다음 시간대의 벽 정보를 저장
+				if (map[t][i][j] == 1)
+					map[t + 1][i + 1][j] = 1;
+			}
 
 	while (!q.empty())
 	{
-		auto temp = q.front();
+		auto p = q.front();
 		q.pop();
-		
+		if (p.time > 8)
+		{
+			cout << 1;
+			return 0;
+		}
 		for (int i = 0; i < 9; i++)
 		{
-			int nx = temp.first + dx[i];
-			int ny = temp.second + dy[i];
+			int nx = p.row + dx[i];
+			int ny = p.col + dy[i];
 			if (nx >= 0 && nx < 8 && ny >= 0 && ny < 8)
 			{
-				if (check_wall(nx, ny)) {
+				if (map[p.time][nx][ny] == 0 && map[p.time + 1][nx][ny] == 0) {
 					if (nx == 0)
 					{
 						cout << 1;
 						return 0;
 					}
-					q.push(make_pair(nx, ny));
+					q.push({ p.time + 1 , nx, ny });
 				}
 			}
 		}
-		move_wall();
 	}
+
 	cout << 0;
 	return 0;
 
