@@ -20,7 +20,7 @@ bool check_wall(int row, int col, int time)
 {
 	if (time + 1 >= wall.size())
 	{
-		vector<Point> v;
+		vector<Point> v = wall[time];
 		int size = wall[time].size();
 		for (int i = 0; i < size; i++)
 		{
@@ -30,8 +30,9 @@ bool check_wall(int row, int col, int time)
 				int ny = wall[time][i].col + dy[j];
 				if (nx >= 0 && nx < r && ny >= 0 && ny < c)
 				{
-					if (map[nx][ny] != 'X' && map[nx][ny] != 'D')
+					if (map[nx][ny] != 'X' && map[nx][ny] != 'D' && map[nx][ny] != '*')
 					{
+						map[nx][ny] = '*';
 						v.push_back({ wall[time][i].time + 1 , nx, ny });
 					}
 				}
@@ -44,7 +45,7 @@ bool check_wall(int row, int col, int time)
 
 	for (int i = 0; i < wall[time+1].size(); i++)
 	{
-		if (wall[time+1][i].time == time + 1 && wall[time+1][i].row == row && wall[time+1][i].col == col)
+		if ( wall[time+1][i].row == row && wall[time+1][i].col == col)
 			return false;
 	}
 	return true;
