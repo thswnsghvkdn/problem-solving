@@ -8,8 +8,8 @@ struct Point {
 	int col;
 	int type;
 };
-int dx[] = { 1,-1,0,0 }; //행 방향 이동
-int dy[] = { 0,0,1,-1 }; //열 방향 이동
+int dx[] = { 1,-1,0,0 }; 
+int dy[] = { 0,0,1,-1 }; 
 char map[51][51];
 deque<Point> d;
 
@@ -46,7 +46,7 @@ void bfs()
 			for (int i = 0; i < 4; i++) {
 				int nx = p.row + dx[i];
 				int ny = p.col + dy[i];
-				if (nx >= 0 && nx < row && ny >= 0 && ny < col && map[nx][ny] != '*' && map[nx][ny] != 'X')
+				if (nx >= 0 && nx < row && ny >= 0 && ny < col && (map[nx][ny] == 'D' || map[nx][ny] == '.'))
 				{
 					if (map[nx][ny] == 'D')
 						map[nx][ny] = 'D';
