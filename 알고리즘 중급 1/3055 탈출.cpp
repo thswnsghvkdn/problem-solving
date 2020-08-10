@@ -1,105 +1,104 @@
 #include <iostream>
-#include <deque>
+#include <queue>
+#include <vector>
 
 using namespace std;
+int dx[] = { 0,0,1,-1, 0 };
+int dy[] = { 1,-1,0,0, 0 };
 
 struct Point {
+	int time;
 	int row;
 	int col;
-	int type;
 };
-int dx[] = { 1,-1,0,0 }; 
-int dy[] = { 0,0,1,-1 }; 
-char map[51][51];
-deque<Point> d;
+int c, r;
+char map[50][50];
+vector<vector<Point>> wall;
 
-int cnt = 0;
-int col, row;
-int ar[] = { 0 , 0 };
-int Dx, Dy;
-int Sx, Sy;
-bool ans = false;
 
-void bfs()
+bool check_wall(int row, int col, int time)
 {
-	while (!d.empty())
+	if (time + 1 >= wall.size())
 	{
-
-		auto p = d.front();
-		d.pop_front();
-
-		if (ar[0] == 0)
+		vector<Point> v = wall[time];
+		int size = wall[time].size();
+		for (int i = 0; i < size; i++)
 		{
-			ar[0] = ar[1];
-			ar[1] = 0;
-			cnt++;
-		}
-
-		if (p.type == 2)
-		{
-			if (p.row == Dx && p.col == Dy)
+			for (int j = 0; j < 5; j++)
 			{
-				ans = true;
-				return;
-			}
-			ar[0] -= 1;
-			for (int i = 0; i < 4; i++) {
-				int nx = p.row + dx[i];
-				int ny = p.col + dy[i];
-				if (nx >= 0 && nx < row && ny >= 0 && ny < col && (map[nx][ny] == 'D' || map[nx][ny] == '.'))
+				int nx = wall[time][i].row + dx[j];
+				int ny = wall[time][i].col + dy[j];
+				if (nx >= 0 && nx < r && ny >= 0 && ny < c)
 				{
-					if (map[nx][ny] == 'D')
-						map[nx][ny] = 'D';
-					else
-						map[nx][ny] = 'S';
-					ar[1]++;
-					d.push_back({ nx,ny,2 });
+					if (map[nx][ny] != 'X' && map[nx][ny] != 'D' && map[nx][ny] != '*')
+					{
+						map[nx][ny] = '*';
+						v.push_back({ wall[time][i].time + 1 , nx, ny });
+					}
 				}
 			}
 		}
-		else {
-			for (int i = 0; i < 4; i++) {
-				int nx = p.row + dx[i];
-				int ny = p.col + dy[i];
-				if (nx >= 0 && nx < row && ny >= 0 && ny < col && map[nx][ny] != '*' && map[nx][ny] != 'X' && map[nx][ny] != 'D')
-				{
-					map[nx][ny] = '*';
-					d.push_back({ nx,ny,1 });
-				}
-			}
-		}
+
+		wall.push_back(v);
 	}
 
-	return;
+
+	for (int i = 0; i < wall[time + 1].size(); i++)
+	{
+		if (wall[time + 1][i].row == row && wall[time + 1][i].col == col)
+			return false;
+	}
+	return true;
 }
 int main()
 {
-	cin >> row >> col;
-	for (int i = 0; i < row; i++)
-	{
-		for (int j = 0; j < col; j++)
+	cin >> r >> c;
+	string s;
+	queue<Point> q;
+	vector<Point> v;
+	for (int i = 0; i < r; i++) {
+		cin >> s;
+		for (int j = 0; j < c; j++)
 		{
-			cin >> map[i][j];
-			if (map[i][j] == '*')
+			map[i][j] = s[j];
+			if (s[j] == 'S')
+				q.push({ 0, i, j });
+			if (s[j] == '*')
+				v.push_back({ 0, i , j });
+		}
+	}
+	wall.push_back(v);
+
+	while (!q.empty())
+	{
+		auto temp = q.front();
+		q.pop();
+		for (int i = 0; i < 5; i++) {
+			int nx = temp.row + dx[i];
+			int ny = temp.col + dy[i];
+			if (nx >= 0 && nx < r && ny >= 0 && ny < c)
 			{
-				d.push_front({ i,j,1 });
-			}
-			if (map[i][j] == 'S')
-			{
-				ar[0]++;
-				d.push_back({ i, j, 2 });
-			}
-			if (map[i][j] == 'D')
-			{
-				Dx = i;
-				Dy = j;
+				if (check_wall(nx, ny, temp.time))
+				{
+					if (map[nx][ny] == 'D')
+					{
+						cout << temp.time + 1;
+						return 0;
+					}
+					if (map[nx][ny] != 'S' && map[nx][ny] != 'X') {
+						map[nx][ny] = 'S';
+						q.push({ temp.time + 1, nx, ny });
+					}
+				}
 			}
 		}
 	}
 
-	bfs();
-	if (ans)
-		cout << cnt;
-	else
-		cout << "KAKTUS";
+	cout << "KAKTUS";
+	return 0;
+
+
+
+
+
 }
