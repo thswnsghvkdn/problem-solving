@@ -1,83 +1,113 @@
-#include <iostream>
-#include <queue>
-#include <algorithm>
-
+#include<iostream>
+#include<queue>
+#include<cstring>
 using namespace std;
 
-int dx[] = { -1,0,1,0};
-int dy[] = { 0,-1,0,1};
+int mm[20][20];
+int n;
+bool visit[20][20];
+int dr[4] = { -1,1,0,0 };
+int dc[4] = { 0,0,-1,1 };
+bool isout(int r, int c) { return r < 0 || c < 0 || r >= n || c >= n; }
 
-int feed = 0;
-int s_size = 2;
-int time = 0;
-
-struct Point{
-	int time; 
-	int x; 
-	int y;
+struct COD {
+	int r, c, cnt;
+	COD(int r, int c) : cnt(0), r(r), c(c) {}
+	COD() : r(0), c(0), cnt(0) {}
 };
 
-queue<Point> q;
+struct cmp {
+	bool operator()(COD c1, COD c2) {
+		if (c1.r == c2.r) { return c1.c > c2.c; }
+		return c1.r > c2.r;
+	}
+};
 
-void Clear()
-{
-	queue<Point> empty;
-	swap(q, empty);
+struct FISH {
+	COD p;
+	int remain;
+	int dist;
+	int size;
+	FISH() :p({ 0,0 }), size(2), remain(2), dist(0) {}
+
+	void eat() {
+		remain--;
+		if (remain == 0) { size++; remain = size; }
+	}
+};
+
+queue<COD> que;
+
+bool ff(FISH& f) {
+	COD now = f.p;
+
+	memset(visit, false, sizeof(visit));
+	visit[now.r][now.c] = true;
+	que.push(now);
+
+	priority_queue<COD, vector<COD>, cmp> pq;
+	queue<COD> temp;
+	que = temp;
+	que.push(now);
+	int cnt;
+	bool isfind = false;
+
+	while (!isfind && que.size()) {
+
+		cnt = que.size();
+		while (cnt--) {
+			now = que.front(); que.pop();
+			if (mm[now.r][now.c] && mm[now.r][now.c] < f.size) {
+				isfind = true;
+				pq.push(now);
+				continue;
+			}
+
+			for (int d = 0; d < 4; d++) {
+				COD next = now;
+				next.r += dr[d];
+				next.c += dc[d];
+				next.cnt++;
+
+				if (isout(next.r, next.c)) continue;
+				if (visit[next.r][next.c]) continue;
+				if (mm[next.r][next.c] > f.size) continue;
+				visit[next.r][next.c] = true;
+				que.push(next);
+			}
+		}
+		if (isfind) break;
+	}
+
+	if (isfind == false) return false;
+
+	now = pq.top(); pq.pop();
+	f.p = now;
+	f.p.cnt = 0;
+	f.eat();
+	f.dist += now.cnt;
+	mm[now.r][now.c] = 0;
+	return true;
 }
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(0), cout.tie(0);
 
-int n;
-int map[20][20];
-int visit[20][20];
-int main()
-{
 	cin >> n;
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < n; j++)
-		{
-			cin >> map[i][j];
-			if (map[i][j] == 9) {
-				q.push({ 0,i,j });
-				map[i][j] = 0;
-				visit[i][j] = true;
-			}
-		}
-	}
-	
-	while (!q.empty())
-	{
-		bool flag = false;
-		auto temp = q.front();
-		q.pop();
-		for (int i = 0; i < 4; i++)
-		{
-			int nx = temp.x + dx[i];
-			int ny = temp.y + dy[i];
-			if (nx >= 0 && nx < n && ny >= 0 && ny < n && map[nx][ny] <= s_size && visit[nx][ny] == false)
-			{
-				if (map[nx][ny] != 0 && map[nx][ny] < s_size)
-				{
-					feed++;
-					if (feed == s_size) {
-						s_size++;
-						feed = 0;
-						flag = true;
-					}
-					time += temp.time+1;
-					Clear(); // 큐 초기화
-					fill(visit[0], visit[n] + n, false); // 방문배열 초기화
-					map[nx][ny] = 0;
-					visit[nx][ny] = true;
-					q.push({0 , nx, ny });
-				}
-				else {
-					q.push({ temp.time + 1 , nx , ny });
-					visit[nx][ny] = temp.time + 1;
-				}
-			}
-			if (flag == true) break;
-		}
-	}
-	cout << time;
 
+	FISH f;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			cin >> mm[i][j];
+			if (mm[i][j] == 9) {
+				f.p.r = i;
+				f.p.c = j;
+				mm[i][j] = 0;
+			}
+		}
+	}
+
+	while (ff(f)) {}
+	cout << f.dist;
+	return 0;
 }
