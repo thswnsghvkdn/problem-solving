@@ -1,113 +1,132 @@
-#include<iostream>
-#include<queue>
-#include<cstring>
+#include <iostream>
+#include <queue>
+#include <algorithm>
+
 using namespace std;
 
-int mm[20][20];
+int dx[] = { -1,0,1,0};
+int dy[] = { 0,-1,0,1};
+
+int min_c;
+int min_r;
+int min_d;
+int s_size = 2;
+
+int map[21][21];
+int visit[21][21];
+int shark_x; 
+int shark_y;
 int n;
-bool visit[20][20];
-int dr[4] = { -1,1,0,0 };
-int dc[4] = { 0,0,-1,1 };
-bool isout(int r, int c) { return r < 0 || c < 0 || r >= n || c >= n; }
 
-struct COD {
-	int r, c, cnt;
-	COD(int r, int c) : cnt(0), r(r), c(c) {}
-	COD() : r(0), c(0), cnt(0) {}
+struct Point {
+	int time; 
+	int x;
+	int y;
 };
 
-struct cmp {
-	bool operator()(COD c1, COD c2) {
-		if (c1.r == c2.r) { return c1.c > c2.c; }
-		return c1.r > c2.r;
-	}
-};
+int tot;
+int feed = 0;
+Point bfs(int x, int y)
+{
+	queue<Point> q;
+	q.push({ 0, x,y });
+	Point ans = { -1, 0 , 0 };
+	visit[x][y] = -1;
+	while (!q.empty())
+	{
+		auto temp = q.front();
+		q.pop();
+		for (int i = 0; i < 4; i++)
+		{
+			int nx = temp.x + dx[i];
+			int ny = temp.y + dy[i];
+			if (nx >= 0 && nx < n && ny >= 0 && ny < n && map[nx][ny] <= s_size && temp.time+1 <= min_d && visit[nx][ny] == 0)
+			{
 
-struct FISH {
-	COD p;
-	int remain;
-	int dist;
-	int size;
-	FISH() :p({ 0,0 }), size(2), remain(2), dist(0) {}
+				if (map[nx][ny] != 0 && map[nx][ny] < s_size && temp.time+1 < min_d)
+				{
+					min_d = temp.time+1;
+					min_c = ny;
+					min_r = nx;
+					ans = { temp.time + 1 ,nx , ny };
+					visit[nx][ny] = temp.time + 1;
+					q.push({ temp.time + 1 ,nx , ny });
+				}
+				else if (map[nx][ny] != 0 && map[nx][ny] < s_size && temp.time+1 == min_d && nx <= min_r)
+				{
+					if (nx == min_r)
+					{
+						if (ny < min_c) {
+							min_c = ny;
+							min_r = nx;
+							ans = { min_d, nx, ny };
+						}
+					}	
+					else {
+						min_c = ny;
+						min_r = nx;
+						ans = { min_d, nx, ny };
+					}
+				}
+				else {
+					visit[nx][ny] = temp.time + 1;
+					q.push({ temp.time + 1 , nx , ny});
+				}
 
-	void eat() {
-		remain--;
-		if (remain == 0) { size++; remain = size; }
-	}
-};
-
-queue<COD> que;
-
-bool ff(FISH& f) {
-	COD now = f.p;
-
-	memset(visit, false, sizeof(visit));
-	visit[now.r][now.c] = true;
-	que.push(now);
-
-	priority_queue<COD, vector<COD>, cmp> pq;
-	queue<COD> temp;
-	que = temp;
-	que.push(now);
-	int cnt;
-	bool isfind = false;
-
-	while (!isfind && que.size()) {
-
-		cnt = que.size();
-		while (cnt--) {
-			now = que.front(); que.pop();
-			if (mm[now.r][now.c] && mm[now.r][now.c] < f.size) {
-				isfind = true;
-				pq.push(now);
-				continue;
-			}
-
-			for (int d = 0; d < 4; d++) {
-				COD next = now;
-				next.r += dr[d];
-				next.c += dc[d];
-				next.cnt++;
-
-				if (isout(next.r, next.c)) continue;
-				if (visit[next.r][next.c]) continue;
-				if (mm[next.r][next.c] > f.size) continue;
-				visit[next.r][next.c] = true;
-				que.push(next);
 			}
 		}
-		if (isfind) break;
 	}
 
-	if (isfind == false) return false;
-
-	now = pq.top(); pq.pop();
-	f.p = now;
-	f.p.cnt = 0;
-	f.eat();
-	f.dist += now.cnt;
-	mm[now.r][now.c] = 0;
-	return true;
+	return ans;
 }
-int main() {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0), cout.tie(0);
-
-	cin >> n;
-
-	FISH f;
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			cin >> mm[i][j];
-			if (mm[i][j] == 9) {
-				f.p.r = i;
-				f.p.c = j;
-				mm[i][j] = 0;
-			}
+void init_map()
+{
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			visit[i][j] = 0;
+			
 		}
 	}
+	min_r = 21;
+	min_c = 21;
+	min_d = 401;
+}
 
-	while (ff(f)) {}
-	cout << f.dist;
-	return 0;
+int main()
+{
+	cin >> n;
+	queue<Point> q;
+	for(int i = 0 ; i < n ; i++)
+		for (int j = 0; j < n; j++)
+		{
+			cin >> map[i][j];
+			if (map[i][j] == 9) {
+				q.push({ 0, i, j });
+				map[i][j] = 0;
+				visit[i][j] = 1;
+			}
+		}
+
+	while (1)
+	{
+		auto temp = q.front();
+		q.pop();
+		init_map();
+		auto shark = bfs(temp.x, temp.y); // 상어가 다음으로 먹은 물고기 위치
+		if (shark.time == -1) break; // 상어가 먹을 물고기가 없으면 bfs()에서 time은 -1을 반환한다.
+
+		tot += shark.time;
+		feed++;
+		if (feed == s_size)
+		{
+			feed = 0;
+			s_size++;
+		}
+		map[shark.x][shark.y] = 0;
+		q.push({ 0 , shark.x , shark.y });
+	}
+	cout << tot;
+
 }
