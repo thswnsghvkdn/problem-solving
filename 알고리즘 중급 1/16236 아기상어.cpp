@@ -7,16 +7,19 @@ using namespace std;
 int dx[] = { -1,0,1,0};
 int dy[] = { 0,-1,0,1};
 
+// 최소 거리와 위치, 시작 상어사이즈
 int min_c;
 int min_r;
 int min_d;
 int s_size = 2;
 
+// 물고기위치
 int map[21][21];
+// 방문여부
 int visit[21][21];
 int shark_x; 
 int shark_y;
-int n;
+int n; // 행, 열
 
 struct Point {
 	int time; 
@@ -24,14 +27,18 @@ struct Point {
 	int y;
 };
 
+// 답
 int tot;
+// 먹은 물고기
 int feed = 0;
+
+// 먹을 물고기 위치를 위한 bfs
 Point bfs(int x, int y)
 {
 	queue<Point> q;
 	q.push({ 0, x,y });
 	Point ans = { -1, 0 , 0 };
-	visit[x][y] = -1;
+	visit[x][y] = -1; // 처음시작위치 표시 그냥 별 이유 없이 -1로 해놈
 	while (!q.empty())
 	{
 		auto temp = q.front();
@@ -43,17 +50,18 @@ Point bfs(int x, int y)
 			if (nx >= 0 && nx < n && ny >= 0 && ny < n && map[nx][ny] <= s_size && temp.time+1 <= min_d && visit[nx][ny] == 0)
 			{
 
-				if (map[nx][ny] != 0 && map[nx][ny] < s_size && temp.time+1 < min_d)
+				if (map[nx][ny] != 0 && map[nx][ny] < s_size && temp.time+1 < min_d) // 최소시간일경우 갱신
 				{
 					min_d = temp.time+1;
 					min_c = ny;
 					min_r = nx;
 					ans = { temp.time + 1 ,nx , ny };
-					visit[nx][ny] = temp.time + 1;
+					visit[nx][ny] = temp.time + 1; // 사실 1로만 해놔도 된다.
 					q.push({ temp.time + 1 ,nx , ny });
 				}
-				else if (map[nx][ny] != 0 && map[nx][ny] < s_size && temp.time+1 == min_d && nx <= min_r)
+				else if (map[nx][ny] != 0 && map[nx][ny] < s_size && temp.time+1 == min_d && nx <= min_r) // 최소시간이 여러 마리 일 때
 				{
+					// 위치비교
 					if (nx == min_r)
 					{
 						if (ny < min_c) {
@@ -79,6 +87,7 @@ Point bfs(int x, int y)
 
 	return ans;
 }
+// 초기화 최소거리 뿐만 아니라 위치도 초기화를 해주어야 한다. 위치비교가 잘못 될수도 있기 때문
 void init_map()
 {
 	for (int i = 0; i < n; i++)
