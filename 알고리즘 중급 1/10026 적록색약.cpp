@@ -1,6 +1,6 @@
 #include <iostream>
 #include <deque>
-
+#include <queue>
 using namespace std;
 
 char map[101][101];
@@ -11,10 +11,54 @@ int dy[] = { 0, 1 , 0 , -1 };
 
 
 bool visit2[101][101];
+int n;
+int cnt;
+queue<pair<int, int >> q;
 
+void bfs()
+{
+	while (!q.empty())
+	{
+		auto temp = q.front();
+		q.pop();
+		visit[temp.first][temp.second] = true;
+
+		for (int i = 0; i < 4; i++)
+		{
+			int nx = temp.first + dx[i];
+			int ny = temp.second + dy[i];
+			if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
+			if (visit[nx][ny]) continue;
+			if (map[nx][ny] == map[temp.first][temp.second]) {
+				q.push(make_pair(nx, ny));
+				visit[nx][ny] = true;
+			}
+		}
+	}
+}
+void bfs2()
+{
+	while (!q.empty())
+	{
+		auto temp = q.front();
+		q.pop();
+		visit2[temp.first][temp.second] = true;
+		for (int i = 0; i < 4; i++)
+		{
+			int nx = temp.first + dx[i];
+			int ny = temp.second + dy[i];
+			if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
+			if (visit2[nx][ny]) continue;
+			if (map_rg[nx][ny] == map_rg[temp.first][temp.second]) {
+				q.push(make_pair(nx, ny));
+				visit2[nx][ny] = true;
+			}
+		}
+	}
+}
 int main()
 {
-	int n;
+
 	cin >> n;
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < n; j++)
@@ -26,57 +70,33 @@ int main()
 
 		}
 
-	deque<pair<int, int>> q;
-	char alpha = 'Z'; // 이전 알파벳
-	int cnt = 0;
-	q.push_front(make_pair(0, 0));
-	visit[0][0] = true;
-	while (!q.empty())
-	{
-		auto temp = q.front();
-		q.pop_front();
-		if (map[temp.first][temp.second] != alpha)
-			cnt++; // 다른 알파벳이 나오면 블록 1증가
-		alpha = map[temp.first][temp.second];
+	cnt = 0;
 
-		for (int i = 0; i < 4; i++)
-		{
-			int nx = temp.first + dx[i];
-			int ny = temp.second + dy[i];
-			if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
-			if (visit[nx][ny]) continue;
-			if (map[nx][ny] == alpha) q.push_front(make_pair(nx, ny));
-			if (map[nx][ny] != alpha) q.push_back(make_pair(nx, ny));
-			visit[nx][ny] = true;
+	for(int i = 0 ; i < n ; i++)
+		for (int j = 0; j < n; j++) {
+			if (!visit[i][j]) {
+				cnt++;
+				q.push(make_pair(i, j));
+				bfs();
+			}
 		}
-	}
+	
 
 	cout << cnt << ' ';
 
-	alpha = 'Z'; // 이전 알파벳
 	cnt = 0;
-	q.push_front(make_pair(0, 0));
-	visit2[0][0] = true;
 
-	while (!q.empty())
-	{
-		auto temp = q.front();
-		q.pop_front();
-		if (map_rg[temp.first][temp.second] != alpha)
-			cnt++; // 다른 알파벳이 나오면 블록 1증가
-		alpha = map_rg[temp.first][temp.second];
 
-		for (int i = 0; i < 4; i++)
-		{
-			int nx = temp.first + dx[i];
-			int ny = temp.second + dy[i];
-			if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
-			if (visit2[nx][ny]) continue;
-			if (map_rg[nx][ny] == alpha) q.push_front(make_pair(nx, ny));
-			if (map_rg[nx][ny] != alpha) q.push_back(make_pair(nx, ny));
-			visit2[nx][ny] = true;
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++) {
+			if (!visit2[i][j]) {
+				cnt++;
+				q.push(make_pair(i, j));
+				bfs2();
+			}
 		}
-	}
+
+	
 
 	cout << cnt;
 }
