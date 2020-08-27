@@ -13,20 +13,57 @@ vector<string> copy(int index, vector<string> cities)
 	unique(temp.begin(), temp.end());
 	return temp;
 }
+int LRU(vector<string> &cache, int size, string city)
+{
+	vector<string>::iterator it = find(cache.begin(), cache.end(), city);
+	if (cache.size() < size)
+	{
+		if (it == cache.end())
+		{
+			cache.push_back(city);
+			return 5;
+		}
+		else
+		{
+			cache.erase(it);
+			cache.push_back(city);
+			return 1;
+		}
+	
+	}
+	
+	else {
+		if (it == cache.end())
+		{
+			cache.erase(cache.begin());
+			cache.push_back(city);
+			return 5;
+		}
+		else
+		{
+			cache.erase(it);
+			cache.push_back(city);
+			return 1;
+		}
+	}
+}
 string change_upper(string s)
 {
-
 	for (int i = 0; i < s.size(); i++)
 	{
 		s[i] = toupper(s[i]);
 	}
-
 	return s;
 }
 int solution(int cacheSize, vector<string> cities) {
 	int answer = 0;
 	bool hit;
 	vector<string> cache;
+	if(cacheSize == 0)
+	{
+		return 5 * cities.size();
+	}
+
 
 	for (int i = 0; i < cities.size(); i++)
 	{
@@ -36,40 +73,13 @@ int solution(int cacheSize, vector<string> cities) {
 
 	for (int i = 0; i < cities.size(); i++)
 	{
-		hit = false;
-		string temp = cities[i];
-		for (int j = 0; j < cache.size(); j++)
-		{
-			if (temp == cache[j]) {
-				answer += 1;
-				hit = true;
-				break;
-			}
-		}
-		if (hit == false && cache.size() == cacheSize)
-		{
-			auto temp_v = copy(i , cities);
-			for (int k = 0; k < cacheSize; k++)
-			{
-				if (cache[k] == temp_v[cacheSize]) {
-					cache[k] = temp;
-					break;
-				}
-			}
-			answer += 5;
-		}
-		if (hit == false && cache.size() < cacheSize)
-		{
-			cache.push_back(cities[i]);
-			answer += 5;
-		}
-
+		answer += LRU(cache, cacheSize, cities[i]);
 	}
 
 	return answer;
 }
 int main()
 {
-	cout << solution(3, { "Jeju", "Pangyo", "Seoul", "NewYork", "LA", "Jeju", "Pangyo", "Seoul", "NewYork", "LA" });
+	cout << solution(5, { "Jeju", "Pangyo", "Seoul", "NewYork", "LA", "SanFrancisco", "Seoul", "Rome","Paris","Jeju","NewYork", "Rome" });
 
 }
