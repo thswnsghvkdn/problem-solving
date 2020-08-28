@@ -5,70 +5,31 @@
 #include <vector>
 using namespace std;
 
-string to_lower(string str)
-{
-	for (int i = 0; i < str.size(); i++)
+using namespace std;
+short a, b, C[676], D[676];
+int solution(string A, string B) {
+	// 2개의 알파벳에 대한 비트 마스킹 ex ) [a][b]
+	int C[700] = { 0 };
+	int D[700] = { 0 };
+	for (int i = 0; i < A.size() - 1; i++)
+		if (isalpha(A[i]) && isalpha(A[i + 1])) // 비트연산으로 알파벳처리 'A' = 10 0001
+			C[(A[i] & 31) * 26 + (A[i + 1] & 31)]++;
+	
+	for (int i = 0; i < B.size() - 1; i++)
+		if (isalpha(B[i]) && isalpha(B[i + 1]))
+			D[(B[i] & 31) * 26 + (B[i + 1] & 31)]++;
+	double s_min = 0, s_max = 0;
+	for (int i = 0; i < 700; i++)
 	{
-		if (str[i] >= 'A' && str[i] <= 'Z')
-			str[i] = tolower(str[i]);
+		s_min += min(C[i], D[i]);
+		s_max += max(C[i], D[i]);
 	}
-	return str;
-}
-int sumset(vector<string> v1, vector<string> v2)
-{
-	vector<string>::iterator it;
-	vector<string> inter;
-	for (int i = 0; i < v1.size(); i++)
-	{
-		it = find(v2.begin(), v2.end(), v1[i]);
-		if (it != v2.end())
-		{
-			v2.erase(it);
-			inter.push_back(v1[i]);
-		}
-	}
-	for (int i = 0; i < v2.size(); i++)
-	{
-		v1.push_back(v2[i]);
-	}
-	double size1 = inter.size();
-	double size2 = v1.size();
-	double ans = 1;
-	if(size2 != 0)
-		ans = size1 / size2;
-	return ans * 65536;
-}
-int solution(string str1, string str2) {
-	int answer = 0;
-	str1 = to_lower(str1);
-	str2 = to_lower(str2);
-	vector<string> v1, v2;
-	for (int i = 0; i < str1.size() - 1; i++)
-	{
-		if (isalpha(str1[i]) && isalpha(str1[i + 1]))
-		{
-			string temp = "";
-			temp += str1[i];
-			temp += str1[i+1];
-
-			v1.push_back(temp);
-		}
-	}
-	for (int i = 0; i < str2.size() - 1; i++)
-	{
-		if (isalpha(str2[i]) && isalpha(str2[i + 1]))
-		{
-			string temp = "";
-			temp += str2[i];
-			temp += str2[i + 1];
-			v2.push_back(temp);
-		}
-	}
-	answer = sumset(v1, v2);
-
-	return answer;
+	double tot = 1;
+	if (s_max != 0)
+		tot = s_min / s_max;
+	return tot * 65536;
 }
 int main()
 {
-	cout << solution("E=M*C^2", "e=m*c^2");
+	cout << solution("FRANCE", "french");
 }
