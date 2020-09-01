@@ -8,6 +8,22 @@ struct TEMP {
 	string name;
 	string code;
 };
+string CtoI(string str) // #을 다른 문자로 바꿀것(+7)
+{
+	string temp;
+	for (int i = 0; i < str.size(); i++)
+	{
+		char ch = str[i];
+		if (str[i + 1] == '#')
+		{
+			i++;
+			ch += 7;
+		}
+		temp += ch;
+	}
+	return temp;
+}
+
 TEMP str_tok(string str)
 {
 	TEMP temp;
@@ -31,71 +47,39 @@ TEMP str_tok(string str)
 		}
 		else temp.name += str[i];
 	}
+	string code;
 	for (; i < str.size(); i++)
 	{
-		temp.code += str[i];
+		code += str[i];
+	}
+	code = CtoI(code);
+	for (int i = 0; i < temp.min; i++)
+	{
+		int index = i % code.size();
+		temp.code += code[index];
 	}
 	return temp;
 
-}
-string CtoI(string str) // #을 다른 문자로 바꿀것(+7)
-{
-	string temp;
-	for (int i = 0; i < str.size(); i++)
-	{
-		char ch = str[i];
-		if (str[i + 1] == '#')
-		{
-			i++;
-			ch += 7;
-		}
-		temp += ch;
-	}
-	return temp;
 }
 
 
 string solution(string m, vector<string> musicinfos) {
-	string answer = "";
+	string answer = "(None)";
 	int max = 0;
 	m = CtoI(m);
 	for (int i = 0; i < musicinfos.size(); i++)
 	{
 		auto temp = str_tok(musicinfos[i]);
 		temp.code = CtoI(temp.code);
-		for (int j = 0; j < temp.code.size(); j++)
+		if (temp.code.find(m) != string::npos && max < temp.min)
 		{
-			if (m[0] == temp.code[j])
-			{
-				string str = temp.code.substr(j) + temp.code.substr(0, j); // 포함여부를 알기위해 코드 재배치 
-				if (str.size() >= m.size())
-				{
-					if (str.find(m) != string::npos && max < temp.min)
-					{
-						max = temp.min;
-						answer = temp.name;
-						
-					}
-					break;
-				}
-				else
-				{
-					if (m.find(str) != string::npos && max < temp.min)
-					{
-						max = temp.min;
-						answer = temp.name;
-					}
-					break;
-				}
-			}
+			max = temp.min;
+			answer = temp.name;
 		}
-
 	}
-	if (answer == "")
-		answer = "`(None)`";
 	return answer;
 }
 int main()
 {
-	solution("ABC", { "03:00,03:30,FOO,A#", "03:00,03:30,BAR,zz" });
+	solution("CC#BCC#BCC#BCC#B", { "03:00,03:30,FOO,CC#B", "04:00,04:08,BAR,CC#BCC#BCC#B" });
 }
