@@ -12,7 +12,10 @@ struct STR{
 };
 bool cmp(STR s1, STR s2)
 {
-	if (s1.head == s2.head) return s1.tail < s2.tail;
+	if (s1.head == s2.head) {
+		if (s1.tail == s2.tail) return s1.index < s2.index;
+		return s1.tail < s2.tail;
+	}
 	return s1.head < s2.head;
 }
 STR str_tok(string temp, int index)
