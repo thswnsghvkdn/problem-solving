@@ -3,12 +3,13 @@
 #include <iostream>
 using namespace std;
 
-struct TEMP {
+struct TEMP // 곡 정보를 구조체
+{
 	int min;
 	string name;
 	string code;
 };
-string CtoI(string str) // #을 다른 문자로 바꿀것(+7)
+string CtoI(string str) // #을 다른 문자로 바꿀것(+7) A# -> H
 {
 	string temp;
 	for (int i = 0; i < str.size(); i++)
@@ -24,7 +25,7 @@ string CtoI(string str) // #을 다른 문자로 바꿀것(+7)
 	return temp;
 }
 
-TEMP str_tok(string str)
+TEMP str_tok(string str) // 입력으로 받은 문자열에서 시간과 곡 . 코드들을 파싱해 가져온다.
 {
 	TEMP temp;
 	// 시간을 분으로 바꾸어 플레이 타임 저장
@@ -39,7 +40,7 @@ TEMP str_tok(string str)
 	temp.min = hour2;
 
 	int i = 12;
-	for (; i < str.size(); i++)
+	for (; i < str.size(); i++) // 곡 이름을 가져온다.
 	{
 		if (str[i] == ',') {
 			i++;
@@ -48,11 +49,11 @@ TEMP str_tok(string str)
 		else temp.name += str[i];
 	}
 	string code;
-	for (; i < str.size(); i++)
+	for (; i < str.size(); i++) // 코드를 가져온다.
 	{
 		code += str[i];
 	}
-	code = CtoI(code);
+	code = CtoI(code); // 코드에서 # 처리 한다.
 	for (int i = 0; i < temp.min; i++)
 	{
 		int index = i % code.size();
@@ -71,6 +72,7 @@ string solution(string m, vector<string> musicinfos) {
 	{
 		auto temp = str_tok(musicinfos[i]);
 		temp.code = CtoI(temp.code);
+		// 재생된 노래에서 기억한 코드들이 포함되어 있는지를 검사한다.
 		if (temp.code.find(m) != string::npos && max < temp.min)
 		{
 			max = temp.min;
