@@ -1,37 +1,36 @@
 #include <iostream>
+#include <stdio.h>
 #include <vector>
-#include <algorithm>
-
 using namespace std;
 #define MAX 100001
-int postorder[MAX];
-int inorder[MAX];
+int in[MAX];
+int post[MAX];
 int position[MAX];
 
-void preorder(int in_s, int in_e, int po_s, int po_e)
+void preorder(int i_s, int i_e, int p_s, int p_e)
 {
-	if (in_s > in_e || po_s > po_e) return;
+	if (i_s > i_e || p_s > p_e) return;
 
-	cout << postorder[po_e] << ' ';
-	int pos = position[postorder[po_e]];
+	int pos = position[post[p_e]];
+	//cout << post[p_e] << ' ';
+	printf("%d ", post[p_e]);
 
-	preorder(in_s, pos - 1, po_s ,po_s + pos);
-	preorder(pos + 1, in_e, pos + in_s, po_e - 1);
+	preorder(i_s, pos - 1, p_s, p_s + (pos - i_s) - 1);
+	preorder(pos + 1, i_e, p_s + (pos - i_s) - 1, p_e - 1);
 
 }
-
 int main()
 {
 	int n;
-	cin >> n;
+	scanf_s("%d", &n);
 	for (int i = 0; i < n; i++)
-		cin >> inorder[i];
+		scanf_s("%d", &in[i]);
 	for (int i = 0; i < n; i++)
-		cin >> postorder[i];
+		scanf_s("%d", &post[i]);
 
 	for (int i = 0; i < n; i++)
-		position[inorder[i]] = i;
+		position[in[i]] = i;
 
 	preorder(0, n - 1, 0, n - 1);
-
+	cout << "\n";
 }
