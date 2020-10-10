@@ -1,51 +1,35 @@
 #include <iostream>
-#include <cmath>
+#include <vector>
+#include <math.h>
 using namespace std;
-
 int ans;
 int row, col;
-void rec(int size, int r, int c)
+void find_key(int n, int r, int c)
 {
-	int range = size / 2;
-	if (size == 2)
-	{
-		if (row % 2)
-		{
-			ans += (2 + col % 2);
-			return;
-		}
-		ans += (col % 2);
+	if (r == row && c == col) {
+		cout << ans;
 		return;
 	}
-	if (row >= r && row < r + range && col >= c && col < c + range) {
-		rec(range, r, c);
-		return;
-	}
-	ans += (range * range);
+	if (!n) return;
+	int stand = pow(2, n - 1);
+	find_key(n - 1, r, c);
+	ans += pow(2, n);
+	find_key(n - 1, r, c + stand);
+	ans += pow(2, n);
+	find_key(n - 1, r + stand, c);
+	ans += pow(2, n);
+	find_key(n - 1, r + stand, c + stand);
+	ans += pow(2, n);
 
-	if (row >= r && row < r + range && col >= c + range && col < c + size) {
-		rec(range, r, c + range);
-		return;
-	}
-	ans += (range * range);
 
-	if (row >= r + range && row < r + size && col >= c && col < c + range) {
-		rec(range, r + range, c);
-		return;
-	}
-	ans += (range * range);
-	
-	if (row >= r + range && row < r + size && col >= c + range && col < c + size)
-		rec(range, r + range, c + range);
 
 }
 
-
 int main()
 {
-	int size;
-	cin >> size >> row >> col;
+	int n;
+	cin >> n >> row >> col;
+	//find_key(n, 0, 0);
 
-	rec(pow(2, size), 0, 0);
-	cout << ans;
+	return 0;
 }
