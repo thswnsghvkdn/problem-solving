@@ -7,19 +7,22 @@ int row, col;
 void find_key(int n, int r, int c)
 {
 	if (r == row && c == col) {
-		cout << ans;
+		cout << ans; // 1씩 z 방향으로 증가한 결과를 출력한다.
 		return;
 	}
-	if (!n) return;
+	if (!n) // 2의 0제곱이 될 경우에 1씩 더한다.
+	{
+		ans++;
+		return;
+	}
 	int stand = pow(2, n - 1);
 	find_key(n - 1, r, c);
-	ans += pow(2, n);
+
 	find_key(n - 1, r, c + stand);
-	ans += pow(2, n);
+
 	find_key(n - 1, r + stand, c);
-	ans += pow(2, n);
+
 	find_key(n - 1, r + stand, c + stand);
-	ans += pow(2, n);
 
 
 
@@ -29,7 +32,7 @@ int main()
 {
 	int n;
 	cin >> n >> row >> col;
-	//find_key(n, 0, 0);
+	find_key(n, 0, 0);
 
 	return 0;
 }
