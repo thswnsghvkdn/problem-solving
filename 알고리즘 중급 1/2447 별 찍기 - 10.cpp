@@ -1,37 +1,45 @@
-#include <cstdio>
+#include <iostream>
 
-char ar[2200][2200];
+char star[6570][6570];
 
-void fill_star(int size, int row, int col)
+using namespace std;
+
+void draw_star(int row, int col, int num)
 {
-	if (size == 1)
-	{
-		ar[row][col] = '*';
+	if (num == 3) {
+		for(int i = 0 ; i < 3 ; i++)
+			for (int j = 0; j < 3; j++)
+			{
+				if (i == 1 && j == 1) continue;
+				star[row + i][col + j] = '*';
+			}
+
 		return;
 	}
-	int div = size / 3;
-	int cnt = 0;
-	for(int i = 0 ; i < 3 ; i++)
+
+	for (int i = 0; i < 3; i++)
 		for (int j = 0; j < 3; j++)
 		{
-			cnt++;
-			if(cnt != 5)
-			fill_star(div, row + (i * div), col + (j * div ));
+			int nx = i * ( num / 3 );
+			int ny = j * ( num / 3 );
+			if (i == 1 && j == 1) continue;
+			draw_star(row + nx, col + ny, num / 3);
 		}
 }
 
 int main()
 {
-	int n;
-	scanf_s("%d", &n);
-	for (int i = 0; i < n; i++)
-		for (int j = 0; j < n; j++)
-			ar[i][j] = ' ';
+	int num;
+	cin >> num;
+	draw_star(0, 0, num );
 
-	fill_star(n, 0, 0);
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++)
-			printf("%c", ar[i][j]);
-		printf("\n");
+	for (int i = 0; i < num; i++) {
+		for (int j = 0; j < num; j++) {
+			if (star[i][j] == '*')
+				cout << star[i][j];
+			else
+				cout << ' ';
+		}
+		cout << "\n";
 	}
 }
