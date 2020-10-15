@@ -1,43 +1,32 @@
 #include <iostream>
-
 using namespace std;
+char star[3100][6200]; // 별을 담을 배열
 
-char ar[3100][6200];
-
-void print_star(int row, int col)
+void draw_star(int row, int col, int size)// 별의 머리 좌표와 사이즈를 인수로 받는다.
 {
-	ar[row][col] = '*';
-	ar[row + 1][col - 1] = '*';
-	ar[row + 1][col + 1] = '*';
-	for (int i = col - 2; i < col + 3; i++)
-		ar[row + 2][i] = '*';
-}
-
-void rec_star(int high, int row, int col)
-{
-	if (high == 3)
+	if (size == 3) // 사이즈가 3일때는 별을 담는다.
 	{
-		print_star(row, col);
+		star[row][col] = '*';
+		star[row + 1][col - 1] = '*';
+		star[row + 1][col + 1] = '*';
+		for (int i = col - 2; i <= col + 2; i++) star[row + 2][i] = '*';
 		return;
 	}
-	int n_high = high / 2;
-	rec_star(n_high , row, col);
-	rec_star(n_high, row + n_high, col - n_high);
-	rec_star(n_high, row + n_high, col + n_high);
-
+	draw_star(row, col, size / 2);
+	draw_star(row + (size / 2), col - (size / 2), size / 2);
+	draw_star(row + (size / 2), col + (size / 2), size / 2);
 }
-
 int main()
 {
-	int n;
-	cin >> n;
-	for (int i = 0; i < n; i++)
-		for (int j = 0; j < 2 * n - 1; j++)
-			ar[i][j] = ' ';
-	rec_star(n, 0, n  - 1);
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n * 2 - 1; j++)
-			cout << ar[i][j];
+	int size;
+	cin >> size;
+	draw_star(0, size-1, size);
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size * 2- 1; j++)
+		{
+			if (star[i][j] == '*') cout << '*';
+			else cout << ' ';
+		}
 		cout << "\n";
 	}
 }
