@@ -6,7 +6,7 @@ using namespace std;
 vector<long long> v;
 vector<char> v2;
 int length;
-long long ans;
+long long ans = -987654321987654321;
 
 long long cal(long long n1, long long n2, char op)
 {
@@ -31,7 +31,7 @@ long long cal(long long n1, long long n2, char op)
 
 void dfs(int index, long long tot)
 {
-	if (index == length)
+	if (index >= length)
 	{
 		ans = max(ans, tot);
 		return;
