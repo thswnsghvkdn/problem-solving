@@ -69,6 +69,44 @@ void erasecctv(int index, int rot, Point cctv) // cctv 타입, 회전방향, cctv 정보
         if (cctv.number == 2) rot++; // 2번 방향은 한번에 방향이 두번씩 증가해야 한다.
     }
 }
+
+int countcctv(Point cctv) // cctv 타입, 회전방향, cctv 정보 0의 갯수를 센다.
+{
+    int rot = 0;
+    int cnt = cctv.number;
+    int direction;
+    int max = 0;
+    int temp = 0;
+    int r = 4;
+    if (cctv.number > 2) cnt--; // 3번 이상인 경우 cnt반복을 순차대로 진행할 경우 cctv방향이 완성된다.
+
+    while (r--) {
+
+        temp = 0;
+        for (int i = 0; i < cnt; i++) {
+            int nx = cctv.x;
+            int ny = cctv.y;
+            while (1)
+            {
+                // 회전방향쪽으로 계속 진행
+                nx += dx[(rot + i) % 4];
+                ny += dy[(rot + i) % 4];
+                if (nx < 0 || nx >= row || ny < 0 || ny >= col || visit[nx][ny] == 6)
+                    break;
+                if (visit[nx][ny] != 0) continue;
+                temp++; // 나중에 지우기 편하게 하기위해 index로 표시한다. 
+            }
+            if (cctv.number == 2) rot++; // 2번 방향은 한번에 방향이 두번씩 증가해야 한다.
+        }
+        if (temp >= max) {
+            direction = rot;
+            max = temp;
+        }
+        rot++;
+        if (cctv.number == 2) rot++;
+    }
+    return direction;
+}
 void dfs(int cnt)
 {
     if (cnt == cctv.size()) // 모든 cctv 방향설정이 끝났다면
@@ -104,7 +142,12 @@ int main()
             if (v[i][j] != 0 && v[i][j] != 6) // cctv인 경우
                 cctv.push_back({ i,j,v[i][j] }); // cctv의 위치와 종류 저장
         }
+    for (int i = 0; i < cctv.size(); i++)
+    {
+        auto temp = cctv[i];
+        int dir = countcctv(temp);
+        drawcctv(i + 1, dir, cctv[i]);
+    }
 
-    dfs(0);
-    cout << ans;
+    cout << blindSpot();
 }
