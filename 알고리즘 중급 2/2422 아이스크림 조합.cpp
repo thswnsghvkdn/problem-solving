@@ -1,46 +1,38 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-
 using namespace std;
-int n, m;
-vector<pair<int, int>>v;
+int firstFlavor;
 int flavor[201][201];
-bool visit[201];
-bool hate[201];
-int tot;
-void dfs(int count, int index)
+int n, m;
+int ans;
+void dfs(int* visit, int index, int count)
 {
-	if (count == 3)
+	for (int i = index + 1; i <= n; i++)
 	{
-		tot++;
-		return;
+		if (visit[i] == false && flavor[firstFlavor][i] == false) {
+			if (count == 2) // 이미 두가지 맛이 선택되어있다면
+				ans++;
+			else
+				dfs(flavor[i], i, count++);
+		}
 	}
-	for (int i = 1; i <= n; i++)
-		if (flavor[index][i]) hate[i] = true;
-	for (int i = index; i <= n; i++)
-	{
-		if (visit[i] || hate[i]) continue;
-		visit[i] = true;
-		dfs(count + 1, i);
-		visit[i] = false;
-	}
-	for (int i = 1; i <= n; i++)
-		if (flavor[index][i]) hate[i] = false;
 }
+
 int main()
 {
 	cin >> n >> m;
-	int t1, t2;
-	for (int i = 0; i < m; i++)
+	int temp1, temp2;
+	for (int i = 1; i <= m; i++)
 	{
-		cin >> t1 >> t2;
-		flavor[t1][t2] = true;
+		cin >> temp1 >> temp2;
+		flavor[temp1][temp2] = true;
+		flavor[temp2][temp1] = true;
 	}
-	for (int i = 1; i <= n; i++) {
-		visit[i] = true;
-		dfs(1, i);
-		visit[i] = false;
+	for (int i = 1; i <= n; i++)
+	{
+		firstFlavor = i;
+		dfs(flavor[i], i, 1);
 	}
-	cout << tot;
+	cout << ans;
 }
