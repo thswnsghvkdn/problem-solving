@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <cstring>
 
 using namespace std;
 int n, m;
@@ -14,6 +15,7 @@ struct Point
 {
 	int x, y;
 };
+vector<Point> v;
 
 void dfs(Point p , int dir, int cnt, int tot)
 {
@@ -50,31 +52,40 @@ void dfs(Point p , int dir, int cnt, int tot)
 
 int main()
 {
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
 	int index = 1;
 	while (1)
 	{
 		cin >> n >> m;
+		ans = -1;
 		unmarked = 0;
+		memset(visit, false, sizeof(visit));
+		memset(map, 0, sizeof(map));
+		v.clear();
+
 		for (int i = 0; i < n; i++)
 			for (int j = 0; j < m; j++) 
 			{
-				visit[i][j] = false;
 				cin >> map[i][j];
-				if (map[i][j] == '.')
-					unmarked++;
-			}
-		
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < m; j++)
-			{
 				if (map[i][j] == '.') {
-					visit[i][j] = true;
-					for (int k = 0; k < 4; k++)
-						dfs({ i , j }, k, 1, 1);
-					visit[i][j] = false;
+					v.push_back({ i,j });
+					unmarked++;
 				}
 			}
-	
+		int v_size = v.size();
+		if (unmarked != 1) {
+			for (int i = 0; i < v_size; i++) {
+				for (int k = 0; k < 4; k++) {
+					visit[v[i].x][v[i].y] = true;
+					dfs({ v[i].x , v[i].y }, k, 1, 1);
+					visit[v[i].x][v[i].y] = false;
+				}
+			}
+		}
+		else
+			ans = 0;
 		cout << "Case "<< index << ": " << ans <<"\n";
 		index++;
 	}
