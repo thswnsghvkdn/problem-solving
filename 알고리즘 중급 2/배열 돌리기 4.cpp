@@ -1,102 +1,99 @@
 #include <iostream>
 #include <vector>
-using namespace std;
-int v[52][52];
-int origin[52][52];
-int v_copy[52][52];
-int dx[] = { -1, 0 ,1 ,0 }; // 위 오 아 왼
-int dy[] = { 0 , 1 ,0 , -1 };
-int n, m, k;
-bool visit[6];
-struct Point {
-	int r, c, s;
-};
-vector<Point> p;
-int ans = -1;
 
-void mCopy(int ori[52][52], int b[52][52]) // a를 b에 저장
+using namespace std;
+
+int n, m, k; // 행, 열 , 회전 수
+int row_sum = -1; // 행의 최솟값
+int mat[51][51]; // 행렬
+bool visit[6];
+
+struct Point{
+	int r , c, s;
+};
+vector<Point> v; // 회전정보를 담을 벡터
+
+void add_row(int mat[51][51]) // 배열에서 행을 더하며 행의 최솟값을 갱신하는 함수
+{
+	int temp; // 각 행의 합을 더할 변수 
+	for (int i = 1; i <= n; i++) {
+		temp = 0;
+		for (int j = 1; j <= m; j++)
+			temp += mat[i][j];
+		if (row_sum == -1 || row_sum > temp)
+			row_sum = temp;
+	}
+}
+
+void copy_mat(int origin[51][51], int backup[51][51]) // 복사
 {
 	for (int i = 1; i <= n; i++)
 		for (int j = 1; j <= m; j++)
-			b[i][j] = ori[i][j];
+			backup[i][j] = origin[i][j];
 }
-void move(int r , int c, int s)
+void rotate_map(int map[51][51], int r, int c, int s, int cnt) // 행렬의 일부를 회전시킬 함수 , cnt는 수행한 회전연산수를 의미한다.
 {
-	if (s == 0) return;
-	int nc = c - s, nr = r - s;
-	int range = 2 * s; // 움직일 범위
+	int backup[51][51];
+	copy_mat(map, backup); // 백업파일에 저장
 
-	mCopy(v, v_copy);
+	if (s == 0) {
+		if(cnt == k)
+			add_row(map);
+			return;
+	}
+	int move = s * 2; // 움직일 거리는 각 줄마다 2 * s 만큼 움직인다.
+	int temp_r = r - s, temp_c = c - s; // 처음 출발할 장소로 움직일 위치를 초기화
+	int temp_factor; // 임시원소
 
-	for (int i = 0, index = 0; i < range; i++)
-	{
-		nc += 1;
-		v_copy[ nr ][ nc ] = v[ nr ][ nc - 1];
-	}
-	for (int i = 0, index = 0; i < range; i++)
-	{
-		nr += 1;
-		v_copy[nr][nc] = v[nr-1][nc];
-	}
-	for (int i = 0, index = 0; i < range; i++)
-	{
-		nc -= 1;
-		v_copy[nr][nc] = v[nr][nc + 1];
-	}
-	for (int i = 0, index = 0; i < range; i++)
-	{
-		nr -= 1;
-		v_copy[nr][nc] = v[nr+1][nc];
-	}
-	mCopy(v_copy, v);
-	move(r, c, s / 2);
+	// 오른쪽 방향으로 가기
+	for (int i = 0; i < move; i++, temp_c++)
+		map[temp_r][temp_c+1] = backup[temp_r][temp_c]; // 한칸씩 옆 칸에 저장한다.
+	
+	// 아래로 가기
+	for (int i = 0; i < move; i++, temp_r++)
+		map[temp_r+1][temp_c] = backup[temp_r][temp_c];
+	// 왼쪽
+	for (int i = 0; i < move; i++, temp_c--)
+		map[temp_r][temp_c-1] = backup[temp_r][temp_c];
+	// 위로
+	for (int i = 0; i < move; i++, temp_r--)
+		map[temp_r-1][temp_c] = backup[temp_r][temp_c];
+
+	rotate_map(map, r, c, s / 2, cnt);
 }
-
-void dfs(int size)
+void dfs(int map[51][51], int cnt)
 {
-	if ( (size + 1) == k) {
-		for (int i = 1; i <= n; i++) {
-			int sum = 0;
-			for (int j = 1; j <= m; j++)
-				sum += v[i][j];
-			if (ans == -1 || sum < ans)
-				ans = sum;
-		}
-		return;
-	}
-
+	int backup[51][51];
+	copy_mat(map, backup);
+	if (cnt == k) return;
 	for (int i = 0; i < k; i++)
 	{
-		if (visit[i]) continue;
+		if (visit[i] == true) continue;
 		visit[i] = true;
-		move(p[i].r, p[i].c, p[i].s);
-		dfs(size + 1);
+		rotate_map(map, v[i].r, v[i].c, v[i].s, cnt+1);
+		dfs(map, cnt + 1);
 		visit[i] = false;
+		copy_mat(backup, map);
 	}
-
 }
-
 int main()
 {
+	int r, c, s; // 회전정보 변수
 	cin >> n >> m >> k;
-	int t1, t2, t3;
-	for(int i = 1; i <= n ; i++)
+	for (int i = 1; i <= n; i++)
 		for (int j = 1; j <= m; j++)
-			cin >> origin[i][j];
-		
-	for (int i = 0; i < k; i++) {
-		cin >> t1 >> t2 >> t3;
-		p.push_back({ t1, t2 ,t3 });
-	}
-
+			cin >> mat[i][j];
 	for (int i = 0; i < k; i++)
 	{
-		mCopy(origin, v);
-		visit[i] = true;
-		move(p[i].r, p[i].c, p[i].s);
-		dfs(i);
-		visit[i] = false;
+		cin >> r >> c >> s;
+		v.push_back({ r, c , s });
 	}
 
-	cout << ans;
+	dfs(mat, 0);
+
+	cout << row_sum << "\n";
+
 }
+
+
+
