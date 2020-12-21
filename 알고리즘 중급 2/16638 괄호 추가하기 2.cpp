@@ -4,11 +4,12 @@
 #include <string>
 #include <queue>
 #include <algorithm>
+#include <math.h>
 using namespace std;
 
 string str;
 int n; // 수식 길이
-long long sum_max; // 결과의 최댓값
+long long sum_max = pow(2.0 , 31) * -1; // 결과의 최댓값
 struct Oper{
 	char ch; // 연산자
 	int pri; // 우선순위 , 우선수위 3은 숫자를 나타낸다.
@@ -98,13 +99,21 @@ void dfs(queue<char> &post, stack<Oper> &s1, int index) // 두개의 스택에 dfs 방�
 		cal(post, s1);
 		return;
 	}
-	post2.push(str[index] - '0');
-	input({ str[index + 1] , get_pri(str[index + 1]) } , post2 , s2);
-	dfs(post2 , s2 ,index + 2);
-	post.push(str[index] - '0');
-	input({ str[index + 1], 2 } , post, s1);
-	dfs(post , s1, index + 2);
 
+	if (index >= 2 && s1.top().pri == 2)
+	{
+		post2.push(str[index] - '0');
+		input({ str[index + 1] , get_pri(str[index + 1]) }, post2, s2);
+		dfs(post2, s2, index + 2);
+	}
+	else {
+		post2.push(str[index] - '0');
+		input({ str[index + 1] , get_pri(str[index + 1]) }, post2, s2);
+		dfs(post2, s2, index + 2);
+		post.push(str[index] - '0');
+		input({ str[index + 1], 2 }, post, s1);
+		dfs(post, s1, index + 2);
+	}
 }
 
 int main()
