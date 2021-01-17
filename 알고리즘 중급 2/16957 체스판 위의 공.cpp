@@ -5,8 +5,8 @@ using namespace std;
 int r, c;
 int ar[502][502];
 int tot[502][502];
-int dx[] = { -1, -1, -1, 0 ,1 , 1, 1, 0 };
-int dy[] = { -1, 0, 1, 1,1, 1, 0, -1,-1 };
+int dx[8] = { 1, -1, 0, 0, 1, 1, -1, -1 };
+int dy[8] = { 0, 0, 1, -1, 1, -1, 1, -1 };
 
 struct point
 {
@@ -54,7 +54,7 @@ int main()
 	for (int i = 1; i <= r; i++)
 		for (int j = 1; j <= c; j++)
 			cin >> ar[i][j];
-	
+
 	for (int i = 1; i <= r; i++)
 		for (int j = 1; j <= c; j++)
 			visit[i][j] = dfs(i, j);
