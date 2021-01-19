@@ -38,7 +38,7 @@ int main()
 	do
 	{
 		int nx = xs, ny = ys;
-		int t = 0;
+		long long t = 0;
 		for (int i = 0; i < 7; i++)
 		{
 			t += dist(nx, v[pri[i]].first.start, ny, v[pri[i]].first.end);
