@@ -16,6 +16,11 @@ function solution(info, query) {
         let q = str.split(" ");
         makeStr(q , Number(q[4]) , 0 , "");    
     })
+    let nobj = {};
+    Object.keys(obj).filter(str =>{
+        nobj[str] = obj[str].sort(function(a,b) { return a > b});
+    })
+
     query.forEach(str =>{
         let q = str.split(" ").filter( a=>{ return a !== "and"});
         let s = "";
@@ -23,13 +28,24 @@ function solution(info, query) {
             s += q[i];
         
         let size = 0;
-        if(obj[s])
-            size = obj[s].length;
+        if(nobj[s])
+            size = nobj[s].length;
         let tot = 0;
-        for(let i = 0 ; i < size ; i++)
-            if(obj[s][i] >= Number(q[4]))
-                tot++;
-        answer.push(tot);
+        
+        let start = 0 , end = size;
+        if(size > 0){
+            while(start < end)
+            {
+                let mid = Math.floor( (start + end) / 2 );
+
+                if(nobj[s][mid] >= q[4])
+                    end = mid;
+                else 
+                    start = mid + 1;
+            }
+            answer.push(size - start);
+        }
+        else answer.push(0);
     })
     console.log(answer)
     return answer;
